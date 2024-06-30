@@ -17,6 +17,7 @@ export default function Home() {
           <p>Pretty timestamp: {new Date(data.user.generated).toUTCString()}</p>
         )}
         {status == "authenticated" && <p>Timestamp: {data.user.generated}</p>}
+        {status == "authenticated" && <p>Expires: {data.user.expires}</p>}
         <div>
           <button className="m-5" onClick={() => signIn("github")}>
             Sign in

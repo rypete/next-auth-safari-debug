@@ -1,5 +1,4 @@
 import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 
 export default NextAuth({
@@ -11,12 +10,56 @@ export default NextAuth({
     }),
   ],
   callbacks: {
-    session: async ({ session }) => {
+    session: async ({ session, token }) => {
       if (session.user) {
-        // @ts-ignore
         session.user.generated = Date.now();
+        session.user.expires = token.expires as number;
       }
+
       return session;
+    },
+    jwt: async ({ token, account }) => {
+      if (token && account) {
+        token.expires = Date.now() + 1000 * 60 * 0.5;
+      }
+
+      if ((token.expires as number) <= Date.now()) {
+        token.expires = Date.now() + 1000 * 60 * 0.5;
+      }
+
+      return token;
+    },
+  },
+  session: {
+    strategy: "jwt",
+  },
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        maxAge: 1 * 24 * 60 * 60,
+        httpOnly: true,
+        sameSite: "strict",
+        path: "/api/auth",
+        secure: true,
+      },
+    },
+    callbackUrl: {
+      name: "next-auth.callback-url",
+      options: {
+        sameSite: "lax",
+        path: "/",
+        secure: true,
+      },
+    },
+    csrfToken: {
+      name: "next-auth.csrf-token",
+      options: {
+        httpOnly: true,
+        sameSite: "strict",
+        path: "/api/auth",
+        secure: true,
+      },
     },
   },
 });
