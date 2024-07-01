@@ -1,21 +1,16 @@
-import Image from "next/image";
-import { Inter } from "next/font/google";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useContext } from "react";
-import { AuthContext } from "./_app";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const { value } = useContext(AuthContext);
+  const { data, status } = useSession();
 
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
+    <main>
       <div>
-        <p>{value}</p>
-
+        <p>status: {status}</p>
+        {status == "authenticated" && (
+          <p>Pretty timestamp: {new Date(data.user.generated).toUTCString()}</p>
+        )}
+        {status == "authenticated" && <p>Timestamp: {data.user.generated}</p>}
         <div>
           <button className="m-5" onClick={() => signIn("github")}>
             Sign in
