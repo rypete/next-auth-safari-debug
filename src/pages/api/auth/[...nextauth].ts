@@ -12,7 +12,7 @@ export default NextAuth({
   callbacks: {
     session: async ({ session, token }) => {
       if (session.user) {
-        session.user.generated = Date.now();
+        session.user.generated = token.generated as number;
         session.user.expires = token.expires as number;
       }
 
@@ -26,6 +26,8 @@ export default NextAuth({
       if ((token.expires as number) <= Date.now()) {
         token.expires = Date.now() + 1000 * 60 * 0.5;
       }
+
+      token.generated = Date.now();
 
       return token;
     },
